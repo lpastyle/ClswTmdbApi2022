@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshPopularPersons() {
         if (tmdbApi != null) {
+            binding.progressWheel.setVisibility(View.VISIBLE);
             Call<PersonPopularResponse> call = tmdbApi.getPersonPopular(ITmdbApi.KEY, String.valueOf(mCurrentPage));
             call.enqueue(new Callback<PersonPopularResponse>() {
                 @Override
@@ -94,14 +95,16 @@ public class MainActivity extends AppCompatActivity {
                     mPersonListAdapter.notifyItemRangeChanged(0,results.size());
                     binding.popularPersonRv.scrollToPosition(0);
                     setPageNumber();
+                    binding.progressWheel.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<PersonPopularResponse> call, @NonNull Throwable t) {
                     Log.e(LOG_TAG, "Call to 'getPersonPopular' failed");
                     results.clear();
+                    binding.progressWheel.setVisibility(View.GONE);
                     mCurrentPage = 0;
-                    //mPersonListAdapter.notifyDataSetChanged();
+                    //mPersonListAdapter.notifyDataSetChanged(); // no longer used due to performance warning
                     mPersonListAdapter.notifyItemRangeChanged(0,0);
                     setPageNumber();
                     Toast toast = Toast.makeText(mContext, R.string.toast_network_error, Toast.LENGTH_LONG);
